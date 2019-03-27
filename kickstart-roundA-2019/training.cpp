@@ -2,7 +2,7 @@
 // Created by Eric Li on 2019-03-25.
 //
 
-/**		
+/**
 * Problem
 As the football coach at your local school, you have been tasked with picking a team of exactly P students to represent your school. There are N students for you to pick from. The i-th student has a skill rating Si, which is a positive integer indicating how skilled they are.
 You have decided that a team is fair if it has exactly P students on it and they all have the same skill rating. That way, everyone plays as a team. Initially, it might not be possible to pick a fair team, so you will give some of the students one-on-one coaching. It takes one hour of coaching to increase the skill rating of any student by 1.
@@ -49,29 +49,36 @@ In Sample Case #3, P = N, so every student will be on your team. You have to spe
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <limits>
+#include <iterator>
 
-void getData(int &p, std::vector<int> &skills) {
+struct Data {
+    std::vector<int> skills;
+    int p;
+};
+
+auto getData() {
     int n;
-    std::cin >> n >> p;
-    for (int i = 0; i < n; i++) {
-        int skill = 0;
-        std::cin >> skill;
-        skills.emplace_back(skill);
-    }
+    Data data;
+
+    std::cin >> n >> data.p;
+
+    data.skills = std::vector<int>(n);
+    std::copy_n(std::istream_iterator<int>(std::cin), n, data.skills.begin());
+
+    return data;
 }
 
-int minTrainingTime(std::vector<int> &skills, int p) {
+auto minTrainingTime(std::vector<int> &skills, int p) {
     std::sort(skills.begin(), skills.end());
-    int low = 0, high = p - 1;
+    auto low = 0, high = p - 1;
 
-    int currentResult = 0;
+    auto currentResult = 0;
     for (int i = 0; i <= high; i++) {
         currentResult += skills[high] - skills[i];
     }
 
-    int minResult = currentResult;
-    int remainingPossibilities = skills.size() - p;
+    auto minResult = currentResult;
+    auto remainingPossibilities = skills.size() - p;
     for (int i = 0; i < remainingPossibilities; i++) {
         currentResult -= skills[++high] - skills[low++];
         currentResult += p * (skills[high] - skills[high - 1]);
@@ -82,13 +89,10 @@ int minTrainingTime(std::vector<int> &skills, int p) {
 }
 
 int main() {
-    int t = 0;
+    auto t = 0;
     std::cin >> t;
-    for (int testCase = 0; testCase < t; testCase++) {
-        int p;
-        std::vector<int> skills;
-        getData(p, skills);
-
-        std::cout << "Case #" << testCase + 1 << ": " << minTrainingTime(skills, p) << std::endl;
+    for (auto testCase = 0; testCase < t; testCase++) {
+        auto data = getData();
+        std::cout << "Case #" << testCase + 1 << ": " << minTrainingTime(data.skills, data.p) << std::endl;
     }
 }
